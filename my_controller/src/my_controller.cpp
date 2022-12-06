@@ -32,6 +32,28 @@ namespace my_controller_ns
 
             return true;
         }
+
+        void update(const ros::Time& time, const ros::Duration& period)
+        {
+            double error = command_ - joint_.getPosition();
+            double commanded_effort = error * gain_;
+            joint_.setCommand(commanded_effort);
+        }
+
+        void starting(const ros::Time& time) {}
+        void stopping(const ros::Time& time) {}
+
+        void setCommandCB(const std_msgs::Float64ConstPtr& msg)
+        {
+            command_ = msg->data;
+        }
+
+        private:
+            hardware_interface::JointHandle joint_;
+            double gain_;
+            double command_;
+            ros::Subscriber sub_command_;
     };
 
+    PLUGINLIB_EXPORT_CLASS(my_controller_ns::MyPositionController, controller_interface::ControllerBase);
 }
